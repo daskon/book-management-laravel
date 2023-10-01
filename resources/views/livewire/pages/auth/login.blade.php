@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Auth;
 
 new #[Layout('layouts.guest')] class extends Component
 {
@@ -38,10 +39,30 @@ new #[Layout('layouts.guest')] class extends Component
 
         session()->regenerate();
 
-        $this->redirect(
-            session('url.intended', RouteServiceProvider::HOME),
-            navigate: true
-        );
+        $role = Auth::user()->role;
+
+        switch ($role) {
+            case 1:
+                $this->redirect('staff/admin', navigate: true);
+                break;
+            case 2:
+            $this->redirect('staff/editor', navigate: true);
+                break;
+            case 3:
+            $this->redirect('staff/viewer', navigate: true);
+                break;
+            case 4:
+            $this->redirect('reader', navigate: true);
+                break;
+            default:
+                Auth::logout();
+                $this->redirect('login', navigate: true);
+                break;
+        }
+        // $this->redirect(
+        //     session('url.intended', RouteServiceProvider::HOME),
+        //     navigate: true
+        // );
     }
 
     protected function ensureIsNotRateLimited(): void
