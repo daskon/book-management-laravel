@@ -6,6 +6,7 @@ use App\Models\Auther;
 use App\Models\Book as ModelsBook;
 use App\Models\Category;
 use App\Models\Publisher;
+use Exception;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,10 +20,35 @@ class Book extends Component
     public $categories;
     public $selectedBook;
     public $model_status = false;
+    public $add_model_status = false;
 
     public $selectedAuth;
     public $selectedPub;
     public $selectedCat;
+
+    public $new_categorie;
+    public $new_publisher;
+    public $new_auther;
+
+    protected $rules = [
+        'bookName' => 'required',
+        'new_categorie' => 'required',
+        'new_publisher' => 'required',
+        'new_auther' => 'required'
+    ];
+
+    /**
+     * open Model popup
+     *
+     * @return void
+     */
+    public function openAddModel()
+    {
+        $this->add_model_status = true;
+        $this->authors = Auther::latest()->get();
+        $this->publishers = Publisher::latest()->get();
+        $this->categories = Category::latest()->get();
+    }
 
     /**
      * close Model popup
@@ -32,6 +58,7 @@ class Book extends Component
     public function closeModel()
     {
         $this->model_status = false;
+        $this->add_model_status = false;
     }
 
     /**
@@ -47,6 +74,30 @@ class Book extends Component
         $this->publishers = Publisher::latest()->get();
         $this->categories = Category::latest()->get();
         $this->selectedBook = $book;
+    }
+
+    /**
+     * insert new Book
+     *
+     * @return void
+     */
+    public function insertBook()
+    {
+        $this->validate();
+        try{
+            ModelsBook::create([
+                'name' => $this->bookName,
+                'auther_id' => $this->new_auther,
+                'category_id' => $this->new_categorie,
+                'publisher_id' => $this->new_publisher
+            ]);
+            session()->flash('message','Book Created Successfully!!');
+            $this->add_model_status = false;
+
+        }catch(Exception $e){
+            session()->flash('message','Something goes wrong while creating book!!');
+            $this->add_model_status = false;
+        }
     }
 
     /**
@@ -114,6 +165,8 @@ class Book extends Component
         $book->save();
 
         session()->flash('message', 'Book successfully updated.');
+
+        $this->resetFields();
     }
 
     /**
