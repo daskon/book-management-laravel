@@ -1,6 +1,6 @@
-## Steps
+## About the app
 
-Technolgies that being used to develop this app was Laravel 10, Livewire, MySQL DB. Multiple roles based access control were added. 
+Technolgies that being used to develop this app was Laravel 10, Livewire, MySQL DB. Multiple roles based access control were added.
 
 - `composer install`
 - `php artisan migrate`

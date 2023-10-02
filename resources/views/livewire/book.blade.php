@@ -10,9 +10,16 @@
             <div class="bg-white p-4 overflow-x-auto overflow-y-hidden shadow-sm sm:rounded-lg">
                 <div>
                   <button data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+                    class="float-right bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
                     ADD NEW
                   </button>
+                </div>
+                <div>
+                    @if (session()->has('message'))
+                        <div class="w-1/3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            {{ session('message') }}
+                        </div>
+                    @endif
                 </div>
                 <div class="relative">
                   <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -47,11 +54,9 @@
                                     </button>
                                   </td>
                                   <td class="delete">
-                                      <form
-                                          class="form-hidden">
-                                          <button class="delete-book bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">Delete</button>
-                                          @csrf
-                                      </form>
+                                    <button wire:click="deleteBook({{$book->id}})" class="delete-book bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
+                                    Delete
+                                    </button>
                                   </td>
                               </tr>
                           @empty
@@ -85,10 +90,17 @@
                     <div class="px-6 py-6 lg:px-8">
                         <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Edit Book</h3>
                         <form class="space-y-6" autocomplete="off">
+                            <div>
+                                @if (session()->has('message'))
+                                    <div class="bg-green-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                                        {{ session('message') }}
+                                    </div>
+                                @endif
+                            </div>
                           @csrf
                           <div class="form-group">
                               <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Book Name</label>
-                              <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" @error('name') isinvalid @enderror"
+                              <input wire:change="setBookName($event.target.value)" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" @error('name') isinvalid @enderror"
                                   placeholder="Book Name" name="name" value="{{ $selectedBook['name'] }}" >
                               @error('name')
                                   <div class="alert alert-danger" role="alert">
@@ -98,7 +110,7 @@
                           </div>
                           <div class="form-group">
                               <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-                              <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                              <select wire:change="setCat($event.target.value)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                  @error('category_id') isinvalid @enderror " name="category_id">
                                   <option value="">Select Category</option>
                                   @foreach ($categories as $category)
@@ -117,7 +129,7 @@
                           </div>
                           <div class="form-group">
                               <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Author</label>
-                              <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                              <select wire:change="setAuth($event.target.value)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                  @error('auther_id') isinvalid @enderror " name="author_id">
                                   <option value="">Select Author</option>
                                   @foreach ($authors as $auther)
@@ -136,7 +148,7 @@
                           </div>
                           <div class="form-group">
                               <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Publisher</label>
-                              <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                              <select wire:change="setPublisher($event.target.value)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                  @error('publisher_id') isinvalid @enderror "
                                   name="publisher_id" >
                                   <option value="">Select Publisher</option>
