@@ -61,7 +61,7 @@
                                         </button>
                                     </td>
                                   @endif
-                                  @if(Auth::user()->role == 1)
+                                  @if(Auth::user()->role == 1 || Auth::user()->role == 2)
                                     <td>
                                         <button wire:click="deleteIssue({{$book->id}})" class="delete-book bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
                                         Delete

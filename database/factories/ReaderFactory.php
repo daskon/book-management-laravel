@@ -18,6 +18,7 @@ class ReaderFactory extends Factory
     {
         $gender=['male','female'];
         return [
+            'reg_no' => random_int(100,900),
             'name' => $this->faker->name,
             'age' => random_int(18,80),
             'gender' => $gender[random_int(0,1)],

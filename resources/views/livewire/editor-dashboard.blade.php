@@ -29,7 +29,7 @@
                                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                                 </svg>
                                 </div>
-                                <a href="/" wire:navigate>
+                                <a href="/assigned-book" wire:navigate>
                                     <h2 class="text-lg text-gray-900 font-medium title-font mb-2">Assign</h2>
                                 </a>
                             </div>

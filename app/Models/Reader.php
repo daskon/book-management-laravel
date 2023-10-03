@@ -10,6 +10,7 @@ class Reader extends Model
     use HasFactory;
 
     protected $fillable = [
+        'reg_no',
         'name',
         'age',
         'gender',
