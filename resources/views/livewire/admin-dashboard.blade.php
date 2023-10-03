@@ -73,7 +73,9 @@
                                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
                               </svg>
                             </div>
-                            <h2 class="text-lg text-gray-900 font-medium title-font mb-2">History</h2>
+                            <a href="/reader-list">
+                             <h2 class="text-lg text-gray-900 font-medium title-font mb-2">Readers</h2>
+                            </a>
                           </div>
                         </div>
                       </div>

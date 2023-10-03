@@ -6,6 +6,7 @@ use App\Livewire\Book;
 use App\Livewire\BorrowBook;
 use App\Livewire\EditorDashboard;
 use App\Livewire\ReaderDashboard;
+use App\Livewire\ReadersList;
 use App\Livewire\ViewerDashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,7 @@ Route::get('/borrow-book/{id}', BorrowBook::class);
 Route::get('/book/edit', [Book::class, 'updateBook'])->name('book.edit');
 
 Route::get('/reader', ReaderDashboard::class)->name('reader');
+Route::get('/reader-list', ReadersList::class)->name('reader.list');
 Route::get('/reader-login', function(){
     return view('reader-form');
 });
