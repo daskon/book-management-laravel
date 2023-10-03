@@ -15,5 +15,4 @@ Please check seeders for login credentials. Default password is `password`
 - staff editor (role id 2)
 - staff viewer (role id 3)
 - reader (role 4) (assumed readers aren't needed to login to view brrowed history)
-    - get reader registration no from th
 
