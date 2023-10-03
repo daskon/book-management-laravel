@@ -22,8 +22,20 @@ class EditorUser
 
         $user = Auth::user();
 
+        if($user->role == 1){
+            return redirect('staff/admin');
+        }
+
         if($user->role == 2){
             return $next($request);
+        }
+
+        if($user->role == 3){
+            return redirect('staff/viewer');
+        }
+
+        if($user->role == 4){
+            return redirect('staff/viewer');
         }
     }
 }

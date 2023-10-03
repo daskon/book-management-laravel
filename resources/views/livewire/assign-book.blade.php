@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Books') }}
+            {{ __('Assigned Books') }}
         </h2>
     </x-slot>
 
@@ -12,7 +12,7 @@
                     <div class="p-2">
                         <button wire:click="openAddModel"
                             class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
-                            ADD NEW
+                            ASSIGN BOOK
                         </button>
                     </div>
                 @endif
@@ -26,40 +26,44 @@
                 <div class="relative">
                   <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <th scope="col" class="px-6 py-3">S.No</th>
+                        <th scope="col" class="px-6 py-3">No</th>
+                        <th scope="col" class="px-6 py-3">Reader Name</th>
                         <th scope="col" class="px-6 py-3">Book Name</th>
-                        <th scope="col" class="px-6 py-3">Category</th>
-                        <th scope="col" class="px-6 py-3">Author</th>
-                        <th scope="col" class="px-6 py-3">Publisher</th>
+                        <th scope="col" class="px-6 py-3">Phone</th>
+                        <th scope="col" class="px-6 py-3">Email</th>
+                        <th scope="col" class="px-6 py-3">Issue Date</th>
+                        <th scope="col" class="px-6 py-3">Return Date</th>
                         <th scope="col" class="px-6 py-3">Status</th>
-                        <th scope="col" class="px-6 py-3">Edit</th>
+                        <th scope="col" class="px-6 py-3">Return</th>
                         <th scope="col" class="px-6 py-3">Delete</th>
                     </thead>
                       <tbody>
-                          @forelse ($books as $book)
-                              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                  <td class="id px-6 py-4">{{ $book->id }}</td>
-                                  <td class="px-6 py-4">{{ $book->name }}</td>
-                                  <td class="px-6 py-4">{{ $book->category->name }}</td>
-                                  <td class="px-6 py-4">{{ $book->auther->name }}</td>
-                                  <td class="px-6 py-4">{{ $book->publisher->name }}</td>
-                                  <td class="px-6 py-4">
-                                      @if ($book->status == 'Y')
-                                          <span class='badge badge-success'>Available</span>
-                                      @else
-                                          <span class='badge badge-danger'>Issued</span>
-                                      @endif
-                                  </td>
+                          @forelse ($issued as $book)
+                          <tr style='@if (date('Y-m-d') > $book->return_date->format('d-m-Y') && $book->issue_status == 'N') ) background:rgba(255,0,0,0.2) @endif'>
+                                <td>{{ $book->id }}</td>
+                                <td>{{ $book->reader->name }}</td>
+                                <td>{{ $book->book->name }}</td>
+                                <td>{{ $book->reader->phone }}</td>
+                                <td>{{ $book->reader->email }}</td>
+                                <td>{{ $book->issue_date->format('d M, Y') }}</td>
+                                <td>{{ $book->return_date->format('d M, Y') }}</td>
+                                <td>
+                                    @if ($book->issue_status == 'Y')
+                                        <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Returned</span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Issued</span>
+                                    @endif
+                                </td>
                                   @if(Auth::user()->role == 1 || Auth::user()->role == 2)
-                                    <td class="edit">
-                                        <button wire:click="bookQuery({{$book}})" class="edit-book bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full">
-                                        EDIT
+                                    <td>
+                                        <button wire:click="returnBook({{$book->id}})" @if ($book->issue_status == 'Y') disabled @endif class="edit-book bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full">
+                                        RETURN
                                         </button>
                                     </td>
                                   @endif
                                   @if(Auth::user()->role == 1)
-                                    <td class="delete">
-                                        <button wire:click="deleteBook({{$book->id}})" class="delete-book bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
+                                    <td>
+                                        <button wire:click="deleteIssue({{$book->id}})" class="delete-book bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
                                         Delete
                                         </button>
                                     </td>
@@ -67,13 +71,13 @@
                               </tr>
                           @empty
                               <tr>
-                                  <td colspan="8">No Books Found</td>
+                                  <td colspan="8">No Books Issued</td>
                               </tr>
                           @endforelse
                       </tbody>
                   </table>
                 </div>
-                {{ $books->links() }}
+                {{ $issued->links() }}
             </div>
         </div>
     </div>
@@ -192,67 +196,39 @@
                       <span class="sr-only">Close modal</span>
                   </button>
                   <div class="px-6 py-6 lg:px-8">
-                      <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Create Book</h3>
+                      <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Assign Book</h3>
                       <form class="space-y-6" autocomplete="off">
                         @csrf
                         <div class="form-group">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Book Name</label>
-                            <input wire:model="bookName" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" @error('name') isinvalid @enderror"
-                                placeholder="Book Name" name="name" >
-                            @error('bookName')
-                                <div class="text-red-700 px-4" role="alert">
+                            <label>Reader Name</label>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" wire:model="student_id" required>
+                                <option value="">Select Name</option>
+                                @foreach ($students as $student)
+                                    <option value='{{ $student->id }}'>{{ $student->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('student_id')
+                                <div class="alert alert-danger" role="alert">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-                            <select wire:model="new_categorie" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                               @error('category_id') isinvalid @enderror " name="category_id">
-                                <option value="">Select Category</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            <label>Book Name</label>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" wire:model="book_id" required>
+                                <option value="">Select Name</option>
+                                @foreach ($bookName as $book)
+                                    <option value='{{ $book->id }}'>{{ $book->name }}</option>
                                 @endforeach
                             </select>
-                            @error('category_id')
-                                <div class="text-red-700 px-4" role="alert">
+                            @error('book_id')
+                                <div class="alert alert-danger" role="alert">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
-                        <div class="form-group">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Author</label>
-                            <select wire:model="new_auther" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                               @error('auther_id') isinvalid @enderror " name="author_id">
-                                <option value="">Select Author</option>
-                                @foreach ($authors as $auther)
-                                    <option value="{{ $auther->id }}">{{ $auther->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('new_auther')
-                                <div class="text-red-700 px-4" role="alert">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Publisher</label>
-                            <select wire:model="new_publisher" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                               @error('publisher_id') isinvalid @enderror "
-                                name="publisher_id" >
-                                <option value="">Select Publisher</option>
-                                @foreach ($publishers as $publisher)
-                                    <option value="{{ $publisher->id }}">{{ $publisher->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('new_publisher')
-                                <div class="text-red-700 px-4" role="alert">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <input type="submit" wire:click.prevent="insertBook" class="edit-book bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full"
-                         value="Create" >
+                        <input type="submit" wire:click.prevent="assignBook" class="edit-book bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-full"
+                         value="Assign" >
                     </form>
                   </div>
               </div>

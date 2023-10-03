@@ -8,4 +8,6 @@ Technolgies that being used to develop this app was Laravel 10, Livewire, MySQL 
 - `npm run dev`
 - `php artisan serve`
 
+Please check seeders for login credentials. Default password is `password`
+
 

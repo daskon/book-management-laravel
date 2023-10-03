@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\AdminDashboard;
+use App\Livewire\AssignBook;
 use App\Livewire\Book;
 use App\Livewire\EditorDashboard;
 use App\Livewire\ReaderDashboard;
@@ -29,11 +30,13 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 Route::get('/book', Book::class);
+Route::get('/assigned-book', AssignBook::class);
+
 Route::get('/book/edit', [Book::class, 'updateBook'])->name('book.edit');
 
 Route::get('/reader', ReaderDashboard::class)->name('reader')->middleware('reader');
 
-Route::group(['prefix' => 'staff'],function(){
+Route::group(['prefix' => 'staff', 'middleware' => 'auth:sanctum'],function(){
     Route::get('admin', AdminDashboard::class)->name('staff.admin')->middleware('admin.user');
     Route::get('viewer', ViewerDashboard::class)->name('staff.viewer')->middleware('viewer.user');
     Route::get('editor', EditorDashboard::class)->name('staff.editor')->middleware('editor.user');
